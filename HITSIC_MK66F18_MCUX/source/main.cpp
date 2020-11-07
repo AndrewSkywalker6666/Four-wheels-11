@@ -138,7 +138,7 @@ void main(void)
     CAM_ZF9V034_GetDefaultConfig(&cameraCfg);
     CAM_ZF9V034_CfgWrite(&cameraCfg);
     //CAM_ZF9V034_CfgRead(&cameraCfg);
-    CAM_ZF9V034_GetReceiverConfig(&dmadvpCfg, &cameraCfg);
+   CAM_ZF9V034_GetReceiverConfig(&dmadvpCfg, &cameraCfg);
     if (kStatus_Success != DMADVP_Init(DMADVP0, &dmadvpCfg))
     {
         PRINTF("DMADVP Init Fail\n");
@@ -147,21 +147,21 @@ void main(void)
     DMADVP_TransferCreateHandle(&dmadvpHandle, DMADVP0, CAM_ZF9V034_UnitTestDmaCallback);
 
     /** 初始化IMU */
-    if (true != imu_6050.Detect())
-    {
-        PRINTF("IMU Detection Fail\n");
-        while (1);
-    }
-    if (0U != imu_6050.Init())
-    {
-        PRINTF("IMU Initialization Fail\n");
-        while (1);
-    }
-    if (0U != imu_6050.SelfTest()) ///> 自检时保持静止，否则会直接失败
-    {
-        PRINTF("IMU Self Test Fail\n");
+   // if (true != imu_6050.Detect())
+    //{
+    //    PRINTF("IMU Detection Fail\n");
+      //  while (1);
+   // }
+   // if (0U != imu_6050.Init())
+    //{
+     //   PRINTF("IMU Initialization Fail\n");
+    //    while (1);
+    //}
+    //if (0U != imu_6050.SelfTest()) ///> 自检时保持静止，否则会直接失败
+    //{
+     //   PRINTF("IMU Self Test Fail\n");
         //while(1);
-    }
+    //}
     /** 菜单就绪 */
     MENU_Resume();
     /** 控制环初始化 */
@@ -182,26 +182,22 @@ void main(void)
 
 void MENU_DataSetUp(void)
 {
-    MENU_ListInsert(menu_menuRoot, MENU_ItemConstruct(nullType, NULL, "MY EXAMPLE", 0, 0));
-    static int32_t region_i = 4096, global_i = 1024;
-    static float region_f = 32.768, global_f = 6.66;
-    static int32_t forceSciData = 202000;
-    static menu_list_t *testList;
-    testList = MENU_ListConstruct("MY EXAMPLE", 50, menu_menuRoot);
-    assert(testList);
+    MENU_ListInsert(menu_menuRoot, MENU_ItemConstruct(nullType, NULL, "EXAMPLE", 0, 0));
+    static int32_t  int_rg =520,int_gl=521;
+    static float fl_rg = 12.345, fl_gl = 6.66;
+    static int32_t sciencedisp = 666600;
+    static menu_list_t *List;
+    List = MENU_ListConstruct("FIRST_TEST", 30, menu_menuRoot);
+    assert(List);
+    MENU_ListInsert(menu_menuRoot, MENU_ItemConstruct(menuType,List, "FIRST_TEST", 0, 0));
     {
-        MENU_ListInsert(testList, MENU_ItemConstruct(variType, &global_i, "global_i", 10, menuItem_data_global));
-        MENU_ListInsert(testList, MENU_ItemConstruct(varfType, &global_f, "global_f", 11, menuItem_data_global));
-        MENU_ListInsert(testList, MENU_ItemConstruct(variType, &region_i, "region_i", 1, menuItem_data_region));
-        MENU_ListInsert(testList, MENU_ItemConstruct(varfType, &region_f, "region_f", 2, menuItem_data_region));
+        MENU_ListInsert(List, MENU_ItemConstruct(variType, &int_rg, "int_rg", 1, menuItem_data_region));
+       MENU_ListInsert(List, MENU_ItemConstruct(variType, &int_gl, "int_gl", 10, menuItem_data_global));
+        MENU_ListInsert(List, MENU_ItemConstruct(varfType, &fl_rg, "fl_rg", 2, menuItem_data_region));
+       MENU_ListInsert(List, MENU_ItemConstruct(varfType, &fl_gl, "fl_gl", 11, menuItem_data_global));
     }
-    MENU_ListInsert(menu_menuRoot,
-            MENU_ItemConstruct(varfType, &longname_f, "C.M.'s Birthday", 0,
-                    menuItem_data_ROFlag | menuItem_data_NoSave | menuItem_data_NoLoad | menuItem_disp_noPreview));
-    MENU_ListInsert(menu_menuRoot,
-            MENU_ItemConstruct(variType, &forceSciData, "forceSci", 0,
-                    menuItem_data_ROFlag | menuItem_data_NoSave | menuItem_data_NoLoad | menuItem_disp_forceSci));
-    CTRL_MenuInit(menu_menuRoot);
+    MENU_ListInsert(menu_menuRoot,MENU_ItemConstruct(variType, &sciencedisp, "sciencedisp", 0,menuItem_data_ROFlag | menuItem_data_NoSave | menuItem_data_NoLoad | menuItem_disp_forceSci));
+    //CTRL_MenuInit(menu_menuRoot);
 }
 
 void CAM_ZF9V034_DmaCallback(edma_handle_t *handle, void *userData, bool transferDone, uint32_t tcds)
